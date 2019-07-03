@@ -1,5 +1,8 @@
+compiler = -Xcxx -I/usr/local/Cellar/v8/7.5.288.22/libexec/include -Xcxx -std=c++11
+linker   = -Xlinker -L/usr/local/Cellar/v8/7.5.288.22/libexec -Xlinker -lv8 -Xlinker -lv8_libplatform
+
 default:
-	swift build -Xcxx -I/usr/local/Cellar/v8/7.5.288.22/libexec/include -Xcxx -std=c++11 -Xlinker -lv8 -Xlinker -L/usr/local/Cellar/v8/7.5.288.22/libexec
+	swift build $(compiler) $(linker)
 
 project:
 	swift package generate-xcodeproj
@@ -12,3 +15,9 @@ clean:
 
 test:
 	swift test
+
+start:
+	./.build/x86_64-apple-macosx/debug/swift
+
+run:
+	swift run $(compiler) $(linker)
