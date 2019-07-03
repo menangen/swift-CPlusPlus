@@ -11,12 +11,12 @@
 
 using namespace std;
 
-const uint8_t
-stringData[] = "'Hello,' + ' Javascript v8!'";
-
 @implementation JS
 + (void) hello : (NSString *) name {
-    cout << "Hello " << [ name cStringUsingEncoding:NSUTF8StringEncoding ] << " in Objective-C++\n";
+    cout << "Hello in Objective-C++\n";
+    
+    const uint8_t*
+    swiftJSString = (uint8_t *) [ name cStringUsingEncoding:NSUTF8StringEncoding ];
     
     /* Initialize V8
     const char* exec_path;
@@ -54,7 +54,7 @@ stringData[] = "'Hello,' + ' Javascript v8!'";
     v8::Local<v8::String>
     source = v8::String::NewFromOneByte(
                                         isolate,
-                                        (uint8_t *) &stringData,
+                                        swiftJSString,
                                         v8::NewStringType::kNormal).ToLocalChecked();
     // Compile the source code.
     v8::Local<v8::Script>
