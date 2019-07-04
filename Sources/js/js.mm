@@ -11,6 +11,32 @@
 
 using namespace std;
 
+using v8::Context;
+using v8::EscapableHandleScope;
+using v8::External;
+using v8::Function;
+using v8::FunctionTemplate;
+using v8::Global;
+using v8::HandleScope;
+using v8::Isolate;
+using v8::Local;
+using v8::MaybeLocal;
+using v8::Name;
+using v8::NamedPropertyHandlerConfiguration;
+using v8::NewStringType;
+using v8::Object;
+using v8::ObjectTemplate;
+using v8::PropertyCallbackInfo;
+using v8::Script;
+using v8::String;
+using v8::TryCatch;
+using v8::Value;
+
+
+static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
+    printf("v8 log: %s\n", "ok!");
+}
+
 @implementation JS
 + (void) hello : (NSString *) name {
     cout << "Hello in Objective-C++\n";
@@ -43,9 +69,15 @@ using namespace std;
     // Create a stack-allocated handle scope.
     v8::HandleScope handle_scope(isolate);
     
+    Local<ObjectTemplate> global = ObjectTemplate::New(isolate);
+    global->Set(
+                String::NewFromUtf8(isolate, "log", v8::NewStringType::kNormal).ToLocalChecked(),
+                FunctionTemplate::New(isolate, LogCallback));
+    
     // Create a new context.
     v8::Local<v8::Context>
-    context = v8::Context::New(isolate);
+    context = v8::Context::New(isolate, NULL, global);
+    
     
     // Enter the context for compiling and running the hello world script.
     v8::Context::Scope context_scope(context);
@@ -56,6 +88,7 @@ using namespace std;
                                         isolate,
                                         swiftJSString,
                                         v8::NewStringType::kNormal).ToLocalChecked();
+    
     // Compile the source code.
     v8::Local<v8::Script>
     script = v8::Script::Compile(context, source).ToLocalChecked();
