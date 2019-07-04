@@ -5,5 +5,5 @@ function ok(name, number) {
     return name + number
 }
 
-ok('Hello, ', 100 + 1)
 log()
+ok('Hello, ', 100 + 1)
