@@ -64,6 +64,11 @@ using namespace std;
     v8::Local<v8::Value> result = script->Run(context).ToLocalChecked();
     
     v8::String::Utf8Value utf8(isolate, result);
-    printf("%s\n", *utf8);
+    printf("v8: %s\n", *utf8);
+    
+    
+    v8::V8::Dispose();
+    v8::V8::ShutdownPlatform();
+    delete create_params.array_buffer_allocator;
 }
 @end

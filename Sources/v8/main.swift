@@ -9,6 +9,8 @@ let fileURL = "\(dir)/\(file).js"
 do {
     let jsFileContent = try String(contentsOf: URL(fileURLWithPath: fileURL), encoding: .utf8)
     
+    print("File data:\n*******\n", jsFileContent, "\n*******\n")
+    
     JS.hello(jsFileContent)
     
 } catch {
