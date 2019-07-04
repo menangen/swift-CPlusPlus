@@ -32,6 +32,13 @@ using v8::String;
 using v8::TryCatch;
 using v8::Value;
 
+@implementation Cat
++ (void) cb {
+    NSLog(@"Mau");
+}
+@end
+
+@implementation JS
 
 static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
     printf("v8: log()");
@@ -54,9 +61,15 @@ static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
     value(isolate, arg);
     
     printf(" { %s }\n", *value);
+    
+    [JS cb: @"new ok"];
+    [Cat cb];
 }
 
-@implementation JS
++ (void) cb : (NSString *) message {
+    NSLog(@"%@", message);
+};
+
 + (void) hello : (NSString *) name {
     cout << "Hello in Objective-C++\n";
     

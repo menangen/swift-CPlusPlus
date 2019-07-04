@@ -1,5 +1,5 @@
-compiler = -Xcxx -I/usr/local/Cellar/v8/7.5.288.22/libexec/include -Xcxx -std=c++11
-linker   = -Xlinker -L/usr/local/Cellar/v8/7.5.288.22/libexec -Xlinker -lv8 -Xlinker -lv8_libplatform
+compiler = -Xcxx -I/usr/local/opt/v8/libexec/include -Xcxx -std=c++11
+linker   = -Xlinker -L/usr/local/opt/v8/libexec -Xlinker -lv8 -Xlinker -lv8_libplatform
 
 default:
 	swift build $(compiler) $(linker)

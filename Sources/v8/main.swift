@@ -4,7 +4,7 @@ print("Hello, Swift!")
 
 let delim = "\n____________________________________\n"
 
-let dir = "/Volumes/RAMDisk/swift/swift-CPlusPlus/Sources/js"
+let dir = "/Users/menangen/sources/swift/swift-v8/Sources/js"
 let file = "index"
 let fileURL = "\(dir)/\(file).js"
 
