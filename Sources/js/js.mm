@@ -5,6 +5,8 @@ using namespace std;
 
 @implementation JS
 + (void) hello : (NSString *) name {
-    cout << "Hello " << [ name cStringUsingEncoding:NSUTF8StringEncoding ] << " in Objective-C++\n";
+    cout << "Hello, " << [ name cStringUsingEncoding:NSUTF8StringEncoding ] << " in Objective-C++\n";
+    
+    [Cat say];
 }
 @end

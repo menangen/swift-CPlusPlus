@@ -1,5 +1,6 @@
 import js
+import game
 
 print("Hello, Swift!")
 
-JS.hello("World")
+JS.hello("menangen")

@@ -2,15 +2,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-c++",
+    name: "v8app",
     dependencies: [],
     targets: [
         .target(
-            name: "js",
+            name: "game",
             dependencies: [],
+            path: "Sources/game"),
+        .target(
+            name: "js",
+            dependencies: ["game"],
             path: "Sources/js"),
         .target(
-            name: "swift",
+            name: "server",
             dependencies: ["js"])
     ]
 )
