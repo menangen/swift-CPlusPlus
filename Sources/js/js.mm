@@ -34,7 +34,26 @@ using v8::Value;
 
 
 static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    printf("v8 log: %s\n", "ok!");
+    printf("v8: log()");
+    
+    if (args.Length() < 1) {
+        printf("\n");
+        return;
+    }
+    
+    Isolate*
+    isolate = args.GetIsolate();
+    
+    HandleScope
+    scope(isolate);
+    
+    Local<Value>
+    arg = args[0];
+    
+    String::Utf8Value
+    value(isolate, arg);
+    
+    printf(" { %s }\n", *value);
 }
 
 @implementation JS
