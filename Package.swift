@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-c++",
+    name: "v8",
     dependencies: [],
     targets: [
         .target(
@@ -10,7 +10,7 @@ let package = Package(
             dependencies: [],
             path: "Sources/js"),
         .target(
-            name: "swift",
+            name: "v8",
             dependencies: ["js"])
     ]
 )
