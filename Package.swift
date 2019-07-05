@@ -15,6 +15,6 @@ let package = Package(
             path: "Sources/js"),
         .target(
             name: "server",
-            dependencies: ["js"])
+            dependencies: ["game", "js"])
     ]
 )
