@@ -32,12 +32,6 @@ using v8::String;
 using v8::TryCatch;
 using v8::Value;
 
-@implementation Cat
-+ (void) cb {
-    NSLog(@"Mau");
-}
-@end
-
 @implementation JS
 
 static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
@@ -61,13 +55,12 @@ static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
     value(isolate, arg);
     
     printf(" { %s }\n", *value);
-    
-    [JS cb: @"new ok"];
-    [Cat cb];
 }
 
-+ (void) cb : (NSString *) message {
-    NSLog(@"%@", message);
++ (void) run : (cb)callback {
+    NSLog(@"callback");
+    
+    callback(YES);
 };
 
 + (void) hello : (NSString *) name {

@@ -14,6 +14,10 @@ do {
     print("File data:\(delim)", jsFileContent, delim)
     
     JS.hello(jsFileContent)
+    JS.run { (status) in
+        print("nice", status)
+    }
+    
     
 } catch {
     print("Can't open file \(fileURL)")

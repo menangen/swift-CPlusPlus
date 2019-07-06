@@ -1,10 +1,8 @@
 #import <Foundation/Foundation.h>
 
-@interface Cat : NSObject
-+ (void) cb;
-@end
+typedef void (^cb)(BOOL status);
 
 @interface JS : NSObject
-+ (void) cb : (NSString *) name;
++ (void) run : (cb)callback;
 + (void) hello : (NSString *) name;
 @end
