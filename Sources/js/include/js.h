@@ -3,6 +3,7 @@
 typedef void (^cb)(BOOL status);
 
 @interface JS : NSObject
-+ (void) run : (cb)callback;
-+ (void) hello : (NSString *) name;
+- (instancetype) init : (NSString*) test;
+- (void) run : (cb)callback;
+- (instancetype) hello;
 @end

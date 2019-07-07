@@ -13,9 +13,15 @@ do {
     
     print("File data:\(delim)", jsFileContent, delim)
     
-    JS.hello(jsFileContent)
-    JS.run { (status) in
-        print("nice", status)
+    if let v8 = JS(jsFileContent) {
+        
+        v8.hello()
+        
+        v8.run { (status) in
+            
+            print("nice", status)
+            
+        }
     }
     
     

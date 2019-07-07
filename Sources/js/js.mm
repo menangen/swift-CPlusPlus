@@ -7,34 +7,22 @@
 #include "libplatform/libplatform.h"
 #include "v8.h"
 
+#import "include/v8_scopes.cpp"
 #import "include/js.h"
-
-using namespace std;
-
-using v8::Context;
-using v8::EscapableHandleScope;
-using v8::External;
-using v8::Function;
-using v8::FunctionTemplate;
-using v8::Global;
-using v8::HandleScope;
-using v8::Isolate;
-using v8::Local;
-using v8::MaybeLocal;
-using v8::Name;
-using v8::NamedPropertyHandlerConfiguration;
-using v8::NewStringType;
-using v8::Object;
-using v8::ObjectTemplate;
-using v8::PropertyCallbackInfo;
-using v8::Script;
-using v8::String;
-using v8::TryCatch;
-using v8::Value;
 
 @implementation JS
 
-static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
+NSString*
+SourceCode_JavaScript;
+
+- (instancetype) init : (NSString*) jsSourceCode {
+    NSLog(@"Init");
+    SourceCode_JavaScript = jsSourceCode;
+    
+    return self;
+}
+
+static void LogCallback (const FunctionCallbackInfo<Value>& args) {
     printf("v8: log()");
     
     if (args.Length() < 1) {
@@ -57,76 +45,84 @@ static void LogCallback(const v8::FunctionCallbackInfo<v8::Value>& args) {
     printf(" { %s }\n", *value);
 }
 
-+ (void) run : (cb)callback {
+- (void) run : (cb)callback {
     NSLog(@"callback");
     
     callback(YES);
 };
 
-+ (void) hello : (NSString *) name {
+- (instancetype) hello {
+    using namespace std;
+    using namespace v8;
+    using namespace v8::platform;
+    
     cout << "Hello in Objective-C++\n";
     
     const uint8_t*
-    swiftJSString = (uint8_t *) [ name cStringUsingEncoding:NSUTF8StringEncoding ];
+    swiftJSString = (uint8_t *) [ SourceCode_JavaScript cStringUsingEncoding:NSUTF8StringEncoding ];
     
-    /* Initialize V8
-    const char* exec_path;
-    const char* icu_data_file = nullptr;
+    unique_ptr<Platform>
+    platform = NewDefaultPlatform();
     
-    v8::V8::InitializeICUDefaultLocation(exec_path, icu_data_file);
-    */
+    V8::InitializePlatform(platform.get());
+    V8::Initialize();
     
-    std::unique_ptr<v8::Platform>
-    platform = v8::platform::NewDefaultPlatform();
-    
-    v8::V8::InitializePlatform(platform.get());
-    v8::V8::Initialize();
-    
-    v8::Isolate::CreateParams
+    Isolate::CreateParams
     create_params;
-    create_params.array_buffer_allocator = v8::ArrayBuffer::Allocator::NewDefaultAllocator();
+    create_params.array_buffer_allocator = ArrayBuffer::Allocator::NewDefaultAllocator();
     
-    v8::Isolate*
-    isolate = v8::Isolate::New(create_params);
+    Isolate*
+    isolate = Isolate::New(create_params);
     
-    v8::Isolate::Scope isolate_scope(isolate);
+    Isolate::Scope isolate_scope(isolate);
     
     // Create a stack-allocated handle scope.
-    v8::HandleScope handle_scope(isolate);
+    HandleScope handle_scope(isolate);
+    
+    Local<ObjectTemplate> player = ObjectTemplate::New(isolate);
+    player->Set(
+                String::NewFromUtf8(isolate, "id", NewStringType::kNormal).ToLocalChecked(),
+                Integer::New(isolate, 12));
     
     Local<ObjectTemplate> global = ObjectTemplate::New(isolate);
+    // Function: log
     global->Set(
-                String::NewFromUtf8(isolate, "log", v8::NewStringType::kNormal).ToLocalChecked(),
+                String::NewFromUtf8(isolate, "log", NewStringType::kNormal).ToLocalChecked(),
                 FunctionTemplate::New(isolate, LogCallback));
+    // Object: Player
+    global->Set(
+                String::NewFromUtf8(isolate, "Player", NewStringType::kNormal).ToLocalChecked(),
+                player);
     
     // Create a new context.
-    v8::Local<v8::Context>
-    context = v8::Context::New(isolate, NULL, global);
+    Local<Context>
+    context = Context::New(isolate, NULL, global);
     
     
     // Enter the context for compiling and running the hello world script.
-    v8::Context::Scope context_scope(context);
+    Context::Scope context_scope(context);
     
     // Create a string containing the JavaScript source code.
-    v8::Local<v8::String>
-    source = v8::String::NewFromOneByte(
-                                        isolate,
-                                        swiftJSString,
-                                        v8::NewStringType::kNormal).ToLocalChecked();
+    Local<String>
+    source = String::NewFromOneByte(
+                                    isolate,
+                                    swiftJSString,
+                                    NewStringType::kNormal).ToLocalChecked();
     
     // Compile the source code.
-    v8::Local<v8::Script>
-    script = v8::Script::Compile(context, source).ToLocalChecked();
+    Local<Script>
+    script = Script::Compile(context, source).ToLocalChecked();
     
     // Run the script to get the result.
-    v8::Local<v8::Value> result = script->Run(context).ToLocalChecked();
+    Local<Value>
+    result = script -> Run(context).ToLocalChecked();
     
-    v8::String::Utf8Value utf8(isolate, result);
+    String::Utf8Value utf8(isolate, result);
     printf("v8: %s\n", *utf8);
     
     
-    v8::V8::Dispose();
-    v8::V8::ShutdownPlatform();
+    V8::Dispose();
+    V8::ShutdownPlatform();
     delete create_params.array_buffer_allocator;
 }
 @end
