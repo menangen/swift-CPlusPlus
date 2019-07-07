@@ -12,7 +12,17 @@
 
 @implementation JS
 
-static void LogCallback(const FunctionCallbackInfo<Value>& args) {
+NSString*
+SourceCode_JavaScript;
+
+- (instancetype) init : (NSString*) jsSourceCode {
+    NSLog(@"Init");
+    SourceCode_JavaScript = jsSourceCode;
+    
+    return self;
+}
+
+static void LogCallback (const FunctionCallbackInfo<Value>& args) {
     printf("v8: log()");
     
     if (args.Length() < 1) {
@@ -35,13 +45,13 @@ static void LogCallback(const FunctionCallbackInfo<Value>& args) {
     printf(" { %s }\n", *value);
 }
 
-+ (void) run : (cb)callback {
+- (void) run : (cb)callback {
     NSLog(@"callback");
     
     callback(YES);
 };
 
-+ (void) hello : (NSString *) name {
+- (instancetype) hello {
     using namespace std;
     using namespace v8;
     using namespace v8::platform;
@@ -49,7 +59,7 @@ static void LogCallback(const FunctionCallbackInfo<Value>& args) {
     cout << "Hello in Objective-C++\n";
     
     const uint8_t*
-    swiftJSString = (uint8_t *) [ name cStringUsingEncoding:NSUTF8StringEncoding ];
+    swiftJSString = (uint8_t *) [ SourceCode_JavaScript cStringUsingEncoding:NSUTF8StringEncoding ];
     
     unique_ptr<Platform>
     platform = NewDefaultPlatform();
@@ -69,10 +79,20 @@ static void LogCallback(const FunctionCallbackInfo<Value>& args) {
     // Create a stack-allocated handle scope.
     HandleScope handle_scope(isolate);
     
+    Local<ObjectTemplate> player = ObjectTemplate::New(isolate);
+    player->Set(
+                String::NewFromUtf8(isolate, "id", NewStringType::kNormal).ToLocalChecked(),
+                Integer::New(isolate, 12));
+    
     Local<ObjectTemplate> global = ObjectTemplate::New(isolate);
+    // Function: log
     global->Set(
                 String::NewFromUtf8(isolate, "log", NewStringType::kNormal).ToLocalChecked(),
                 FunctionTemplate::New(isolate, LogCallback));
+    // Object: Player
+    global->Set(
+                String::NewFromUtf8(isolate, "Player", NewStringType::kNormal).ToLocalChecked(),
+                player);
     
     // Create a new context.
     Local<Context>
@@ -85,16 +105,17 @@ static void LogCallback(const FunctionCallbackInfo<Value>& args) {
     // Create a string containing the JavaScript source code.
     Local<String>
     source = String::NewFromOneByte(
-                                        isolate,
-                                        swiftJSString,
-                                        NewStringType::kNormal).ToLocalChecked();
+                                    isolate,
+                                    swiftJSString,
+                                    NewStringType::kNormal).ToLocalChecked();
     
     // Compile the source code.
     Local<Script>
     script = Script::Compile(context, source).ToLocalChecked();
     
     // Run the script to get the result.
-    Local<Value> result = script->Run(context).ToLocalChecked();
+    Local<Value>
+    result = script -> Run(context).ToLocalChecked();
     
     String::Utf8Value utf8(isolate, result);
     printf("v8: %s\n", *utf8);

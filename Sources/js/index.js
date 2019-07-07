@@ -6,4 +6,6 @@ function ok(name, number) {
 }
 
 log("menangen")
+log(Player.id)
+
 ok('Hello, ', 100 + 1)
