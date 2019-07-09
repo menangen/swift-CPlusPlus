@@ -13,16 +13,14 @@ do {
     
     print("File data:\(delim)", jsFileContent, delim)
     
-    if let v8 = JS(jsFileContent) {
+    let v8 = JS(jsFileContent)
+    v8.hello()
+    
+    v8.run({ (status) in
         
-        v8.hello()
+        print("nice", status)
         
-        v8.run { (status) in
-            
-            print("nice", status)
-            
-        }
-    }
+    })
     
     
 } catch {

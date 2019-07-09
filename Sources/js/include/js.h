@@ -1,9 +1,10 @@
 #import <Foundation/Foundation.h>
 
-typedef void (^cb)(BOOL status);
+typedef
+void (^cb) (BOOL status);
 
 @interface JS : NSObject
-- (instancetype) init : (NSString*) test;
-- (void) run : (cb)callback;
-- (instancetype) hello;
+- (nonnull instancetype) init : (NSString* _Nonnull) code;
+- (void) run : (cb _Nullable ) callback;
+- (void) hello;
 @end

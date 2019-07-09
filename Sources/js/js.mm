@@ -13,11 +13,11 @@
 @implementation JS
 
 NSString*
-SourceCode_JavaScript;
+sourceCode;
 
-- (instancetype) init : (NSString*) jsSourceCode {
+- (nonnull instancetype) init : (NSString*) code {
     NSLog(@"Init");
-    SourceCode_JavaScript = jsSourceCode;
+    sourceCode = code;
     
     return self;
 }
@@ -45,13 +45,15 @@ static void LogCallback (const FunctionCallbackInfo<Value>& args) {
     printf(" { %s }\n", *value);
 }
 
-- (void) run : (cb)callback {
+- (void) run : (cb _Nullable) callback {
     NSLog(@"callback");
     
-    callback(YES);
+    if (callback) {
+        callback(YES);
+    }
 };
 
-- (instancetype) hello {
+- (void) hello {
     using namespace std;
     using namespace v8;
     using namespace v8::platform;
@@ -59,7 +61,7 @@ static void LogCallback (const FunctionCallbackInfo<Value>& args) {
     cout << "Hello in Objective-C++\n";
     
     const uint8_t*
-    swiftJSString = (uint8_t *) [ SourceCode_JavaScript cStringUsingEncoding:NSUTF8StringEncoding ];
+    swiftJSString = (uint8_t *) [ sourceCode cStringUsingEncoding:NSUTF8StringEncoding ];
     
     unique_ptr<Platform>
     platform = NewDefaultPlatform();
