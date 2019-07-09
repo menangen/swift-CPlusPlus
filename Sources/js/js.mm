@@ -15,6 +15,9 @@
 NSString*
 sourceCode;
 
+cb
+swiftPlayer = nil;
+
 - (nonnull instancetype) init : (NSString*) code {
     NSLog(@"Init");
     sourceCode = code;
@@ -22,43 +25,27 @@ sourceCode;
     return self;
 }
 
-static void LogCallback (const FunctionCallbackInfo<Value>& args) {
-    printf("v8: log()");
+void Move(const FunctionCallbackInfo<v8::Value>& args) {
+    NSLog(@"Move");
     
-    if (args.Length() < 1) {
-        printf("\n");
-        return;
+    if (swiftPlayer) {
+        swiftPlayer(YES);
+    } else {
+        NSLog(@"Player: No callback!");
     }
-    
-    Isolate*
-    isolate = args.GetIsolate();
-    
-    HandleScope
-    scope(isolate);
-    
-    Local<Value>
-    arg = args[0];
-    
-    String::Utf8Value
-    value(isolate, arg);
-    
-    printf(" { %s }\n", *value);
 }
 
-- (void) run : (cb _Nullable) callback {
-    NSLog(@"callback");
-    
-    if (callback) {
-        callback(YES);
-    }
-};
-
-- (void) hello {
+- (void) run: (cb _Nullable) callback {
     using namespace std;
     using namespace v8;
     using namespace v8::platform;
     
     cout << "Hello in Objective-C++\n";
+    
+    if (callback) {
+        NSLog(@"set callback");
+        swiftPlayer = callback;
+    }
     
     const uint8_t*
     swiftJSString = (uint8_t *) [ sourceCode cStringUsingEncoding:NSUTF8StringEncoding ];
@@ -80,20 +67,49 @@ static void LogCallback (const FunctionCallbackInfo<Value>& args) {
     
     // Create a stack-allocated handle scope.
     HandleScope handle_scope(isolate);
-    
-    Local<ObjectTemplate> player = ObjectTemplate::New(isolate);
-    player->Set(
-                String::NewFromUtf8(isolate, "id", NewStringType::kNormal).ToLocalChecked(),
-                Integer::New(isolate, 12));
-    
+  
     Local<ObjectTemplate> global = ObjectTemplate::New(isolate);
+    
     // Function: log
     global->Set(
-                String::NewFromUtf8(isolate, "log", NewStringType::kNormal).ToLocalChecked(),
-                FunctionTemplate::New(isolate, LogCallback));
+                String::NewFromUtf8( isolate, "log", NewStringType::kNormal).ToLocalChecked(),
+                FunctionTemplate::New( isolate,
+                                       [](const FunctionCallbackInfo<Value>& args) {
+                                            printf("v8: log()");
+
+                                            if (args.Length() < 1) {
+                                              printf("\n");
+                                              return;
+                                            }
+
+                                            Isolate*
+                                            isolate = args.GetIsolate();
+
+                                            HandleScope
+                                            scope(isolate);
+
+                                            Local<Value>
+                                            arg = args[0];
+
+                                            String::Utf8Value
+                                            value(isolate, arg);
+
+                                            printf(" { %s }\n", *value);
+                                       }
+                                      ));
+
+    Local<ObjectTemplate>
+    player = ObjectTemplate::New(isolate);
+    player->Set(
+                String::NewFromUtf8(isolate, "id"),
+                Integer::New(isolate, 12));
+    
+    player->Set(
+                String::NewFromUtf8(isolate, "move"),
+                FunctionTemplate::New( isolate, Move));
+    
     // Object: Player
-    global->Set(
-                String::NewFromUtf8(isolate, "Player", NewStringType::kNormal).ToLocalChecked(),
+    global->Set(String::NewFromUtf8(isolate, "Player"),
                 player);
     
     // Create a new context.
@@ -126,5 +142,10 @@ static void LogCallback (const FunctionCallbackInfo<Value>& args) {
     V8::Dispose();
     V8::ShutdownPlatform();
     delete create_params.array_buffer_allocator;
+}
+
+- (void) dealloc
+{
+    NSLog(@"dealloc");
 }
 @end

@@ -14,7 +14,6 @@ do {
     print("File data:\(delim)", jsFileContent, delim)
     
     let v8 = JS(jsFileContent)
-    v8.hello()
     
     v8.run({ (status) in
         

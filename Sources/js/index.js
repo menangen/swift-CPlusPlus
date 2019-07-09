@@ -5,7 +5,8 @@ function ok(name, number) {
     return name + number
 }
 
-log("menangen")
-log(Player.id)
+log(`Player.id = ${Player.id}`)
 
-ok('Hello, ', 100 + 1)
+Player.move()
+
+ok('Hello, ', 11 + 1)
