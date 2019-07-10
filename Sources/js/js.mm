@@ -10,6 +10,8 @@
 #import "include/v8_scopes.cpp"
 #import "include/js.h"
 
+using v8Args = const FunctionCallbackInfo<Value>&;
+
 @implementation JS
 
 NSString*
@@ -25,7 +27,7 @@ swiftPlayer = nil;
     return self;
 }
 
-void Move(const FunctionCallbackInfo<v8::Value>& args) {
+void Move(v8Args args) {
     NSLog(@"Move");
     
     if (swiftPlayer) {
@@ -68,13 +70,14 @@ void Move(const FunctionCallbackInfo<v8::Value>& args) {
     // Create a stack-allocated handle scope.
     HandleScope handle_scope(isolate);
   
-    Local<ObjectTemplate> global = ObjectTemplate::New(isolate);
+    Local<ObjectTemplate>
+    global = ObjectTemplate::New(isolate);
     
     // Function: log
     global->Set(
-                String::NewFromUtf8( isolate, "log", NewStringType::kNormal).ToLocalChecked(),
+                String::NewFromUtf8( isolate, "log"),
                 FunctionTemplate::New( isolate,
-                                       [](const FunctionCallbackInfo<Value>& args) {
+                                       [](const auto& args) {
                                             printf("v8: log()");
 
                                             if (args.Length() < 1) {
@@ -106,7 +109,7 @@ void Move(const FunctionCallbackInfo<v8::Value>& args) {
     
     player->Set(
                 String::NewFromUtf8(isolate, "move"),
-                FunctionTemplate::New( isolate, Move));
+                FunctionTemplate::New( isolate, Move ));
     
     // Object: Player
     global->Set(String::NewFromUtf8(isolate, "Player"),
